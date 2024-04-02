@@ -1,8 +1,9 @@
 import json
 import requests
+from sys import argv
 
 ##################################################################################
-#										 #
+#										                                         #
 #                    Basic Dictionary Script                                     #
 #         This script asks the user for a word they want the definition of       #
 #        It will then append that word to the free dictionary API URL            #
@@ -12,13 +13,19 @@ import requests
 #    It also checks to make sure the user entered a real word                    #
 #    If a real word is not entered it will return the error from the site        #
 #  I'm sure there is plenty of room for improvement, like the try, except used   #
-#         To be used from a command line, not sure how to make GUIs yet		 #
-#										 #
+#         To be used from a command line, not sure how to make GUIs yet		     #
+#										                                         #
 ##################################################################################
 
 apiUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/"  # URL of the free dictionary, minus the word
 
-unkWord = input("\nWhat word do you want the definition for? ")  # Asks user for the word and stores it in unkWord
+# can use the command line option of adding the word after the script to search right away in this fashion: python3 definitionScript.py word
+# if nothing is added on the command line it will ask user what word to search
+if len(argv) > 1:
+    unkWord = argv[1]
+else:
+    unkWord = input("\nWhat word do you want the definition for? ")  # Asks user for the word and stores it in unkWord
+
 
 fullUrl = apiUrl + unkWord  # appends the word to the URL
 
