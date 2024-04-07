@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import json
 import requests
 from sys import argv
@@ -17,30 +18,52 @@ from sys import argv
 #										                                         #
 ##################################################################################
 
-apiUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/"  # URL of the free dictionary, minus the word
-
-# can use the command line option of adding the word after the script to search right away in this fashion: python3 definitionScript.py word
-# if nothing is added on the command line it will ask user what word to search
-if len(argv) > 1:
-    unkWord = argv[1]
-else:
-    unkWord = input("\nWhat word do you want the definition for? ")  # Asks user for the word and stores it in unkWord
+#function to access api and return the json?
+def wordSearch(x):
+    apiUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/"  # URL of the free dictionary, minus the word
+    url1 = apiUrl + x
+    response = requests.get(url1)
+    return(response.json())
 
 
-fullUrl = apiUrl + unkWord  # appends the word to the URL
+#function to return specific part of speech only, or all depending on user desires
+def posReturn(rJson, pos): #pos stands for piece of... just kidding it's part of speech
+    try:
+        rJson[0]['word']
+        for i in rJson:
+            for meaning in i["meanings"]:
+                if meaning['partOfSpeech'] == pos or pos == 0:
+                    print("\n" + meaning["partOfSpeech"])  # This part prints the part of speech before each definition, so nouns, verbs, and all those will be in their own lists
+                for definition in meaning["definitions"]:
+                    if meaning['partOfSpeech'] == pos or pos == 0:
+                        print('definition: ' + definition["definition"])  # this prints the actual definitions after "definition:"
+        print()  # this adds a space between each part of speech
+    except KeyError:
+         print(rJson["title"] + ". " + rJson["message"])  # this gives the response from the site for not using a valid word
+    print() #this might be unecessary, it was just meant to make it a bit cleaner, but i think it just adds too many blank lines right now. will probably update in a future..update
 
-response = requests.get(fullUrl)  # API request for the word, stored in response
+#function to return examples
+#def exampleReturn(json, example):
+#to be added in the future
 
-responseJson = response.json()  # stores the response in json format
 
-try:  # This will attempt to find a "title" in the response, if it's there it will provide the "no valid word" response from the site
-    responseJson["title"]  # if a valid word is used there is not "title" in the response, so that's what I used
-    print(responseJson["title"] + ". " + responseJson["message"])  # this gives the response from the site for not using a valid word
-    print()
-except TypeError:  # There is no "title" when a valid word is used, so it gives this error
-    for i in responseJson:  # The format from the response is weird, it was a list with dictionaries in it, so I had to iterate over it with for loops
-        for meaning in i["meanings"]:
-            print("\n" + meaning["partOfSpeech"])  # This part prints the part of speech before each definition, so nouns, verbs, and all those will be in their own lists
-            for definition in meaning["definitions"]:
-                print('definition: ' + definition["definition"])  # this prints the actual definitions after "definition:"
-    print()  # this adds a space between each part of speech
+
+def main():
+    if len(argv) > 1:
+        unkWord = argv[1]
+        try:
+            pos = argv[2]
+        except IndexError:
+            pos = 0
+    else:
+        userInput = input("\nEnter the word and part of speech separated by a space.\nIf you want all parts of speech, just enter a word.\n")  # Asks user for the word and stores it in unkWord
+        try:
+            unkWord, pos = userInput.split()
+        except ValueError:
+            unkWord = userInput
+            pos = 0
+    responseJson = wordSearch(unkWord)
+    posReturn(responseJson, pos)
+
+if __name__ == "__main__":
+    main()
