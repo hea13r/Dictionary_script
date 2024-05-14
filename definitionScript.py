@@ -27,7 +27,7 @@ def wordSearch(x):
 
 
 #function to return specific part of speech only, or all depending on user desires
-def posReturn(rJson, pos): #pos stands for piece of... just kidding it's part of speech
+def posReturn(rJson, pos): #pos stands for part of speech
     try:
         rJson[0]['word']
         for i in rJson:
